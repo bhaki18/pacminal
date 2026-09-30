@@ -16,6 +16,7 @@
 #define APPLE 6000
 #define EGHOST 7000
 #define VOID 8000
+#define BUFF_LAST 20
 
 void gameloop();
 void define_map();
@@ -23,6 +24,9 @@ void init_entiys();
 void move_pacman();
 void mossa_utente();
 void event_buff();
+void buff_handler();
+void print_map();
+void pulisci_terminale();
 
 
 int game_running = 1;
@@ -30,18 +34,32 @@ int map[map_height][map_width];
 int entitys[map_height][map_width];
 int pacman_x = 1;
 int pacman_y = 0;
-int input_recived = 0;
+
 int points = 0;
+int waiter = 0;
+int buff_active = 0;
+
 
 
 int main(){ 
-
+    define_map();
+    init_entiys();
+    gameloop();
     return 0;
 }
 
 void gameloop(){
     while(game_running){
-
+        mossa_utente();
+        pulisci_terminale();
+        mossa_utente();
+        move_pacman();
+        mossa_utente();
+        buff_handler();
+        mossa_utente();
+        print_map();
+        mossa_utente();
+        usleep(FPS);
     }
 }
 
@@ -122,28 +140,28 @@ void mossa_utente(){
 
         int c = getch();
 
-        if (c == 'w' && pacman_y == 0 && input_recived == 0){
+        if (c == 'w' && pacman_y == 0 ){
             pacman_y = -1;
             pacman_x = 0;
-            input_recived = 1;
+            
         }
 
-        if (c == 'a' && pacman_x == 0 && input_recived == 0){
+        if (c == 'a' && pacman_x == 0 ){
             pacman_x = -1;
             pacman_y = 0;
-            input_recived = 1;
+            
         }
 
-        if (c == 's' && pacman_y == 0 && input_recived == 0){
+        if (c == 's' && pacman_y == 0 ){
             pacman_y = 1;
             pacman_x = 0;
-            input_recived = 1;
+            
         }
         
-        if (c == 'd' && pacman_x == 0 && input_recived == 0){
+        if (c == 'd' && pacman_x == 0 ){
             pacman_x = 1;
             pacman_y = 0;
-            input_recived = 1;
+            
         }
         
     
@@ -152,26 +170,32 @@ void mossa_utente(){
 }
 
 void move_pacman(){
-    int pacman_pos_x;
-    int pacman_pos_y;
+    int pacman_pos_x = -1;
+    int pacman_pos_y = -1;
     for(int i = 0;i<map_height;i++){
         for(int j = 0;j<map_width;j++){
-            if(map[i][j] == PACMAN){
+            if(entitys[i][j] == PACMAN){
                 pacman_pos_x = j;
                 pacman_pos_y = i;
             }
         }
     }
+
+    if(pacman_pos_x == -1 && pacman_pos_y == -1){
+        printf("pacman non trovato");
+        return;
+    }
+
     int old_pacman_pos_x = pacman_pos_x;
     int old_pacman_pos_y = pacman_pos_y;
 
-    if(pacman_x == 1){
+    if(pacman_x == 1 && pacman_pos_x<map_width-1){
         pacman_pos_x++;
-    }else if(pacman_pos_x == -1){
+    }else if(pacman_x == -1 && pacman_pos_x>0){
         pacman_pos_x--;
-    }else if(pacman_pos_y == 1){
+    }else if(pacman_y == 1 && pacman_pos_y > 0){
         pacman_pos_y--;
-    }else if(pacman_pos_y == -1){
+    }else if(pacman_y == -1 && pacman_pos_y<map_height-1){
         pacman_pos_y++;
     }
 
@@ -181,22 +205,109 @@ void move_pacman(){
         }else if(entitys[pacman_pos_y][pacman_pos_x] == EGHOST){
             points += 400;
             entitys[pacman_pos_y][pacman_pos_x] = PACMAN;
-        }else if(map[pacman_pos_x][pacman_pos_y] == ORB){
+        }else if(map[pacman_pos_y][pacman_pos_x] == ORB){
             points += 10;
-        }else if(map[pacman_pos_x][pacman_pos_y] == APPLE){
+            map[pacman_pos_y][pacman_pos_x] = VOID;
+        }else if(map[pacman_pos_y][pacman_pos_x] == APPLE){
             points += 500;
-        }else if(map[pacman_pos_x][pacman_pos_y] == BUFF){
+            map[pacman_pos_y][pacman_pos_x] = VOID;
+        }else if(map[pacman_pos_y][pacman_pos_x] == BUFF){
             event_buff();
             points += 100;
+            map[pacman_pos_y][pacman_pos_x] = VOID;
         }else{
             entitys[pacman_pos_y][pacman_pos_x] = PACMAN;
         }
-
         entitys[old_pacman_pos_y][old_pacman_pos_x] = 0;
 
     }
+
+    
 }
 
 void event_buff(){
     // evento da definire per quando il pacman mangia un buff
+    for(int i = 0;i<map_height;i++){
+        for(int j = 0;j<map_width;j++){
+            if(entitys[i][j] == GHOST){
+                entitys[i][j] = EGHOST;
+            }
+        }
+    }
+
+    waiter = BUFF_LAST;
+    buff_active = 1;
+
+}
+
+void buff_handler(){
+    if(buff_active){
+            waiter--;
+            if(!waiter){
+                buff_active = 0;
+                for(int i = 0;i<map_height;i++){
+                    for(int j = 0;j<map_width;j++){
+                        if(entitys[i][j] == EGHOST){
+                            entitys[i][j] = GHOST;
+                        }
+                    }
+                }
+            }
+        }
+}
+
+
+void print_map(){
+    int real_map[map_height][map_width];
+
+    for(int i = 0;i<map_height;i++){
+        for(int j = 0;j<map_width;j++){
+            real_map[i][j] = map[i][j];
+        }
+    }
+
+    for(int i = 0;i<map_height;i++){
+        for(int j = 0;j<map_width;j++){
+            if(entitys[i][j] != 0){
+                real_map[i][j] = entitys[i][j];
+            }
+        }
+    }
+
+    char printable_map[map_height][map_width];
+    for(int i = 0;i<map_height;i++){
+        for(int j = 0;j<map_width;j++){
+            int cat = real_map[i][j];
+            if(cat == WALL){
+                printable_map[i][j] = '#';
+            }else if(cat == GATE){
+                printable_map[i][j] = '_';
+            }else if(cat == GHOST){
+                printable_map[i][j] = 'B';
+            }else if(cat == PACMAN){
+                printable_map[i][j] = 'C';
+            }else if(cat == ORB){
+                printable_map[i][j] = '*';
+            }else if(cat == BUFF){
+                printable_map[i][j] = 'o';
+            }else if(cat == APPLE){
+                printable_map[i][j] = '@';
+            }else if(cat == EGHOST){
+                printable_map[i][j] = 'A';
+            }else if(cat == VOID){
+                printable_map[i][j] = ' ';
+            }
+        }
+    }
+
+    for(int i = 0;i<map_height;i++){
+        for(int j = 0;j<map_width;j++){
+            printf("%c",printable_map[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void pulisci_terminale() {
+    printf("\033[2J\033[H");
 }
