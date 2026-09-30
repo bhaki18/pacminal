@@ -285,6 +285,7 @@ void buff_handler(){
 
 
 void print_map(){
+    
     int real_map[map_height][map_width];
 
     for(int i = 0;i<map_height;i++){
@@ -333,6 +334,8 @@ void print_map(){
         }
         printf("\n");
     }
+
+    printf("points:%d\n",points);
 }
 
 void pulisci_terminale() {
