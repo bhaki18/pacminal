@@ -1,5 +1,3 @@
 # lista dei bugs
 
-manca ancora il print dei punti
-
-i ghosts non si muovono ancora
+i ghost si muovono senza un senso logico e non cercano il pacman
