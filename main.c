@@ -443,20 +443,20 @@ void handle_ghosts(){
 void move_ghost(int ghost_x,int ghost_y,int pac_x,int pac_y,int type){
     int delta_x = 0;
     int delta_y = 0;
-    int move_left = 0;
+    int move_left = 1;
     int move_x = 0;
-    int move_down = 0;
+    int move_down = 1;
     int move_y = 0;
     delta_x = ghost_x - pac_x;
     delta_y = ghost_y - pac_y;
     if(delta_x < 0){
         delta_x = -delta_x;
-        move_left = 1;
+        move_left = 0;
     }
 
     if (delta_y < 0){
         delta_y = -delta_y;
-        move_down = 1;
+        move_down = 0;
     }
 
     if(delta_x < delta_y){
@@ -465,19 +465,18 @@ void move_ghost(int ghost_x,int ghost_y,int pac_x,int pac_y,int type){
         move_x = 1;
     }
 
-    if(move_x){
-        if(move_left && map[ghost_y][ghost_x - 1] != WALL && map[ghost_y][ghost_x - 1] != GATE && entitys[ghost_y][ghost_x - 1] != GHOST&& entitys[ghost_y][ghost_x - 1] != EGHOST){
+    
+        if(move_x && move_left && map[ghost_y][ghost_x - 1] != WALL && map[ghost_y][ghost_x - 1] != GATE && entitys[ghost_y][ghost_x - 1] != GHOST&& entitys[ghost_y][ghost_x - 1] != EGHOST){
             entitys[ghost_y][ghost_x - 1] = type;
             entitys[ghost_y][ghost_x] = 0;
-        }else if(!move_left && map[ghost_y][ghost_x + 1] != WALL && map[ghost_y][ghost_x + 1] != GATE && entitys[ghost_y][ghost_x + 1] != GHOST && entitys[ghost_y][ghost_x + 1] != EGHOST){
+        }else if(move_x && !move_left && map[ghost_y][ghost_x + 1] != WALL && map[ghost_y][ghost_x + 1] != GATE && entitys[ghost_y][ghost_x + 1] != GHOST && entitys[ghost_y][ghost_x + 1] != EGHOST){
             entitys[ghost_y][ghost_x + 1] = type;
             entitys[ghost_y][ghost_x] = 0;
         }
-    }
-    else if(move_down && map[ghost_y + 1][ghost_x] != WALL && map[ghost_y + 1][ghost_x] != GATE && entitys[ghost_y + 1][ghost_x] != GHOST && entitys[ghost_y + 1][ghost_x] != EGHOST){
+        else if(move_y && move_down && map[ghost_y + 1][ghost_x] != WALL && map[ghost_y + 1][ghost_x] != GATE && entitys[ghost_y + 1][ghost_x] != GHOST && entitys[ghost_y + 1][ghost_x] != EGHOST){
             entitys[ghost_y + 1][ghost_x] = type;
             entitys[ghost_y][ghost_x] = 0;
-        }else if(!move_down && map[ghost_y - 1][ghost_x] != WALL && map[ghost_y - 1][ghost_x] != GATE && entitys[ghost_y - 1][ghost_x] != GHOST && entitys[ghost_y - 1][ghost_x] != EGHOST){
+        }else if(move_y && !move_down && map[ghost_y - 1][ghost_x] != WALL && map[ghost_y - 1][ghost_x] != GATE && entitys[ghost_y - 1][ghost_x] != GHOST && entitys[ghost_y - 1][ghost_x] != EGHOST){
             entitys[ghost_y - 1][ghost_x] = type;
             entitys[ghost_y][ghost_x] = 0;
         }
