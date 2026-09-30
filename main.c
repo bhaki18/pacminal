@@ -11,13 +11,15 @@
 #define BUFF 5000
 #define APPLE 6000
 #define EGHOST 7000
+#define VOID 8000
 
 void gameloop();
 void define_map();
+void init_entiys();
 
 int game_running = 1;
 int map[map_height][map_width];
-
+int entitys[map_height][map_width];
 int main(){ 
 
     return 0;
@@ -73,8 +75,18 @@ void define_map(){
                 map[i][j] = BUFF;
             }else if(mappa[i][j] == "*"){
                 map[i][j] = ORB;
+            }else{
+                map[i][j] = VOID;
             }
         }
     }
 
+}
+
+void init_entiys(){
+    for(int i = 0;i<map_height;i++){
+        for(int j = 0;j<map_width;j++){
+            
+        }
+    }
 }
