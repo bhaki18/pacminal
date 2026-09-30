@@ -27,6 +27,8 @@ void event_buff();
 void buff_handler();
 void print_map();
 void pulisci_terminale();
+void handle_ghosts();
+void move_ghost(int ghost_x,int ghost_y,int pac_x,int pac_y,int type);
 
 
 int game_running = 1;
@@ -38,6 +40,9 @@ int pacman_y = 0;
 int points = 0;
 int waiter = 0;
 int buff_active = 0;
+
+
+
 
 
 
@@ -55,6 +60,7 @@ void gameloop(){
         mossa_utente();
         move_pacman();
         mossa_utente();
+        handle_ghosts();
         buff_handler();
         mossa_utente();
         print_map();
@@ -340,4 +346,70 @@ void print_map(){
 
 void pulisci_terminale() {
     printf("\033[2J\033[H");
+}
+
+void handle_ghosts(){
+    int pac_x = -1;
+    int pac_y = -1;
+    for(int i = 0;i<map_height;i++){
+        for(int j =0;j<map_width;j++){
+            if(entitys[i][j] == PACMAN){
+                pac_x = j;
+                pac_y = i;
+            }
+        }
+    }
+    for(int i = 0;i<map_height;i++){
+        for(int j =0;j<map_width;j++){
+            if(entitys[i][j] == GHOST){
+                move_ghost(j,i,pac_x,pac_y,GHOST);
+            }else if(entitys[i][j] == EGHOST){
+                move_ghost(j,i,pac_x,pac_y,EGHOST);
+            }
+        }
+    }
+}
+
+void move_ghost(int ghost_x,int ghost_y,int pac_x,int pac_y,int type){
+    int delta_x = 0;
+    int delta_y = 0;
+    int move_left = 0;
+    int move_x = 0;
+    int move_down = 0;
+    int move_y = 0;
+    delta_x = ghost_x - pac_x;
+    delta_y = ghost_y - pac_y;
+    if(delta_x < 0){
+        delta_x = -delta_x;
+        move_left = 1;
+    }
+
+    if (delta_y < 0){
+        delta_y = -delta_y;
+        move_down = 1;
+    }
+
+    if(delta_x > delta_y){
+        move_y = 1;
+    }else{
+        move_x = 1;
+    }
+
+    if(move_x){
+        if(move_left && entitys[ghost_y][ghost_x - 1] != WALL && entitys[ghost_y][ghost_x - 1] != GATE && entitys[ghost_y][ghost_x - 1] != GHOST&& entitys[ghost_y][ghost_x - 1] != EGHOST){
+            entitys[ghost_y][ghost_x - 1] = type;
+            entitys[ghost_y][ghost_x] = 0;
+        }else if(entitys[ghost_y][ghost_x + 1] != WALL && entitys[ghost_y][ghost_x + 1] != GATE && entitys[ghost_y][ghost_x + 1] != GHOST && entitys[ghost_y][ghost_x + 1] != EGHOST){
+            entitys[ghost_y][ghost_x + 1] = type;
+            entitys[ghost_y][ghost_x] = 0;
+        }
+    }else{
+        if(move_down && entitys[ghost_y + 1][ghost_x] != WALL && entitys[ghost_y + 1][ghost_x] != GATE && entitys[ghost_y + 1][ghost_x] != GHOST && entitys[ghost_y + 1][ghost_x] != EGHOST){
+            entitys[ghost_y + 1][ghost_x] = type;
+            entitys[ghost_y][ghost_x] = 0;
+        }else if(entitys[ghost_y - 1][ghost_x] != WALL && entitys[ghost_y - 1][ghost_x] != GATE && entitys[ghost_y - 1][ghost_x] != GHOST && entitys[ghost_y - 1][ghost_x] != EGHOST){
+            entitys[ghost_y - 1][ghost_x] = type;
+            entitys[ghost_y][ghost_x] = 0;
+        }
+    }
 }
