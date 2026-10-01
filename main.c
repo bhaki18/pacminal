@@ -441,44 +441,48 @@ void handle_ghosts(){
 }
 
 void move_ghost(int ghost_x,int ghost_y,int pac_x,int pac_y,int type){
-    int delta_x = 0;
-    int delta_y = 0;
-    int move_left = 1;
-    int move_x = 0;
-    int move_down = 1;
-    int move_y = 0;
-    delta_x = ghost_x - pac_x;
-    delta_y = ghost_y - pac_y;
+
+    int move_left = 0;
+    int move_right = 0;
+    int move_up = 0;
+    int move_down = 0;
+
+    int delta_x = ghost_x - pac_x;
+    int delta_y = ghost_y - pac_y;
+
     if(delta_x < 0){
         delta_x = -delta_x;
-        move_left = 0;
+        move_left ++;
+        move_right --;
+    }else if(delta_x > 0){
+        move_left --;
+        move_right ++;
     }
 
-    if (delta_y < 0){
+    if(delta_y < 0){
         delta_y = -delta_y;
-        move_down = 0;
+        move_down ++;
+        move_up --;
+    }else if(delta_y > 0){
+        move_down --;
+        move_up ++;
+    }
+
+    if(delta_x > delta_y){
+        move_left++;
+        move_right++;
     }
 
     if(delta_x < delta_y){
-        move_y = 1;
-    }else{
-        move_x = 1;
+        move_up++;
+        move_down++;
     }
 
-    
-        if(move_x && move_left && map[ghost_y][ghost_x - 1] != WALL && map[ghost_y][ghost_x - 1] != GATE && entitys[ghost_y][ghost_x - 1] != GHOST&& entitys[ghost_y][ghost_x - 1] != EGHOST){
-            entitys[ghost_y][ghost_x - 1] = type;
-            entitys[ghost_y][ghost_x] = 0;
-        }else if(move_x && !move_left && map[ghost_y][ghost_x + 1] != WALL && map[ghost_y][ghost_x + 1] != GATE && entitys[ghost_y][ghost_x + 1] != GHOST && entitys[ghost_y][ghost_x + 1] != EGHOST){
-            entitys[ghost_y][ghost_x + 1] = type;
-            entitys[ghost_y][ghost_x] = 0;
-        }
-        else if(move_y && move_down && map[ghost_y + 1][ghost_x] != WALL && map[ghost_y + 1][ghost_x] != GATE && entitys[ghost_y + 1][ghost_x] != GHOST && entitys[ghost_y + 1][ghost_x] != EGHOST){
-            entitys[ghost_y + 1][ghost_x] = type;
-            entitys[ghost_y][ghost_x] = 0;
-        }else if(move_y && !move_down && map[ghost_y - 1][ghost_x] != WALL && map[ghost_y - 1][ghost_x] != GATE && entitys[ghost_y - 1][ghost_x] != GHOST && entitys[ghost_y - 1][ghost_x] != EGHOST){
-            entitys[ghost_y - 1][ghost_x] = type;
-            entitys[ghost_y][ghost_x] = 0;
-        }
+    if(move_right > move_left && move_right > move_down && move_right > move_up){
+        
+    }
+
+
+
     
 }
